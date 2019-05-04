@@ -23,6 +23,7 @@
 # TESTS = 1
 # BENCHMARKS = 1
 # OSD = sdl
+# MAIN_SHARED_LIB = 1
 
 # NO_OPENGL = 0
 # USE_DISPATCH_GL = 0
@@ -725,6 +726,10 @@ endif
 
 ifdef NOWERROR
 PARAMS += --NOWERROR='$(NOWERROR)'
+endif
+
+ifdef MAIN_SHARED_LIB
+PARAMS += --MAIN_SHARED_LIB='$(MAIN_SHARED_LIB)'
 endif
 
 ifdef TARGET

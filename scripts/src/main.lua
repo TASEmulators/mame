@@ -24,7 +24,13 @@ else
 	project (_subtarget)
 end
 	uuid (os.uuid(_target .."_" .. _subtarget))
-	kind "ConsoleApp"
+	
+	if _OPTIONS["MAIN_SHARED_LIB"]=="1" then
+		kind "SharedLib"
+		targetprefix "lib"
+	else
+		kind "ConsoleApp"
+	end
 
 	configuration { "android*" }
 		targetprefix "lib"
@@ -69,8 +75,15 @@ end
 			targetsuffix "dp"
 		end
 
-	configuration { "mingw*" or "vs20*" }
-		targetextension ".exe"
+	configuration { "mingw*" }
+		if _OPTIONS["MAIN_SHARED_LIB"]=="1" then
+			targetextension ".dll"			
+			buildoptions {
+				"-fvisibility=hidden",
+			}
+		else
+			targetextension ".exe"
+		end
 
 	configuration { "asmjs" }
 		targetextension ".html"
@@ -250,6 +263,16 @@ if (STANDALONE~=true) then
 				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", true  },
 			}
 		end
+	end
+	
+	if _OPTIONS["MAIN_SHARED_LIB"]=="1" then
+		includedirs {
+			MAME_DIR .. "3rdparty/sol2",
+		}
+		files {
+			MAME_DIR .. "src/mame/exports.cpp",
+			MAME_DIR .. "src/mame/exports.h",
+		}
 	end
 
 	local mainfile = MAME_DIR .. "src/".._target .."/" .. _subtarget ..".cpp"

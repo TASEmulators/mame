@@ -376,8 +376,17 @@ newoption {
 
 
 newoption {
+	trigger = "MAIN_SHARED_LIB",
+	description = "Build main binary as SharedLib (not available for pnacl and winstore*)",
+	allowed = {
+		{ "0",  "Build as ConsoleApp" },
+		{ "1",  "Build as SharedLib"  },
+	},
+}
+
+newoption {
 	trigger = "SHLIB",
-	description = "Generate shared libs.",
+	description = "Build core projects as shared libs.",
 	allowed = {
 		{ "0",   "Static libs"  },
 		{ "1",   "Shared libs"  },
@@ -703,6 +712,12 @@ end
 if _OPTIONS["NOASM"]=="1" then
 	defines {
 		"MAME_NOASM"
+	}
+end
+
+if _OPTIONS["MAIN_SHARED_LIB"]=="1" then
+	defines {
+		"MAME_SHARED_LIB"
 	}
 end
 
