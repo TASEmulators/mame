@@ -33,6 +33,9 @@
 #include "corestr.h"
 #include "unzip.h"
 #include "xmlfile.h"
+#ifdef MAME_SHARED_LIB
+#include "../../mame/exports.h"
+#endif
 
 #include "osdepend.h"
 
@@ -285,6 +288,11 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	m_result = EMU_ERR_NONE;
 	mame_machine_manager *manager = mame_machine_manager::instance(m_options, m_osd);
 
+#ifdef MAME_SHARED_LIB
+	export_output export_log;
+	osd_output::push(&export_log);
+#endif
+
 	try
 	{
 		start_execution(manager, args);
@@ -346,6 +354,10 @@ int cli_frontend::execute(std::vector<std::string> &args)
 		osd_printf_error("Caught unhandled exception\n");
 		m_result = EMU_ERR_FATALERROR;
 	}
+
+#ifdef MAME_SHARED_LIB
+	osd_output::pop(&export_log);
+#endif
 
 	util::archive_file::cache_clear();
 	delete manager;
