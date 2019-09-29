@@ -22,7 +22,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -63,7 +67,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -110,7 +118,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -150,7 +162,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -196,7 +212,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -242,7 +262,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -288,7 +312,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -328,7 +356,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -368,7 +400,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -410,7 +446,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -450,7 +490,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -499,7 +543,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -544,7 +592,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -588,7 +640,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -635,7 +691,11 @@ flags {
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then
-	targetdir(MAME_DIR)
+	if _OPTIONS["BIN_DIR"] then
+		targetdir(_OPTIONS["BIN_DIR"])
+	else
+		targetdir(MAME_DIR)
+	end
 end
 
 links {
@@ -735,7 +795,11 @@ if _OPTIONS["targetos"] == "macosx" then
 		}
 
 		if _OPTIONS["SEPARATE_BIN"]~="1" then
-			targetdir(MAME_DIR)
+			if _OPTIONS["BIN_DIR"] then
+				targetdir(_OPTIONS["BIN_DIR"])
+			else
+				targetdir(MAME_DIR)
+			end
 		end
 
 		linkoptions {
@@ -777,7 +841,11 @@ if (_OPTIONS["osd"] == "sdl") then
 	}
 
 	if _OPTIONS["SEPARATE_BIN"]~="1" then
-		targetdir(MAME_DIR)
+		if _OPTIONS["BIN_DIR"] then
+			targetdir(_OPTIONS["BIN_DIR"])
+		else
+			targetdir(MAME_DIR)
+		end
 	end
 
 	links {

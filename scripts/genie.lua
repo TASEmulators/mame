@@ -352,6 +352,11 @@ newoption {
 }
 
 newoption {
+	trigger = "BIN_DIR",
+	description = "Bin folder override.",
+}
+
+newoption {
 	trigger = "PYTHON_EXECUTABLE",
 	description = "Python executable.",
 }

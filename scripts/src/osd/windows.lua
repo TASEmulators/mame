@@ -247,7 +247,11 @@ if _OPTIONS["with-tools"] then
 		}
 
 		if _OPTIONS["SEPARATE_BIN"]~="1" then
-			targetdir(MAME_DIR)
+			if _OPTIONS["BIN_DIR"] then
+				targetdir(_OPTIONS["BIN_DIR"])
+			else
+				targetdir(MAME_DIR)
+			end
 		end
 
 		links {

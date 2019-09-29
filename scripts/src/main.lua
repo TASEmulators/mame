@@ -115,7 +115,11 @@ end
 		end
 	else
 		if _OPTIONS["SEPARATE_BIN"]~="1" then
-			targetdir(MAME_DIR)
+			if _OPTIONS["BIN_DIR"] then
+				targetdir(_OPTIONS["BIN_DIR"])
+			else
+				targetdir(MAME_DIR)
+			end
 		end
 	end
 
@@ -346,7 +350,11 @@ end
 	if _OPTIONS["DEBUG_DIR"]~=nil then
 		debugdir(_OPTIONS["DEBUG_DIR"])
 	else
-		debugdir (MAME_DIR)
+		if _OPTIONS["BIN_DIR"] then
+			debugdir(_OPTIONS["BIN_DIR"])
+		else
+			debugdir(MAME_DIR)
+		end
 	end
 	if _OPTIONS["DEBUG_ARGS"]~=nil then
 		debugargs (_OPTIONS["DEBUG_ARGS"])
