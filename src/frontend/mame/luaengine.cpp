@@ -525,6 +525,9 @@ void lua_engine::on_frame_done()
 
 void lua_engine::on_sound_update()
 {
+#ifdef MAME_SHARED_LIB
+	export_sound_callback();
+#endif
 	execute_function("LUA_ON_SOUND_UPDATE");
 }
 

@@ -21,6 +21,7 @@
 
 void export_frame_callback();
 void export_periodic_callback();
+void export_sound_callback();
 void export_boot_callback();
 
 class export_output : public osd_output

@@ -62,6 +62,7 @@ T get_lua_value(const char *code)
 
 void(*frame_callback)(void) = nullptr;
 void(*periodic_callback)(void) = nullptr;
+void(*sound_callback)(void) = nullptr;
 void(*boot_callback)(void) = nullptr;
 void(*log_callback)(int channel, int size, const char *buffer) = nullptr;
 
@@ -85,6 +86,17 @@ void export_periodic_callback()
 {
 	if (periodic_callback)
 		periodic_callback();
+}
+
+//-------------------------------------------------
+//  export_sound_callback - inform the client
+//  that mame has already generated new sound samples
+//-------------------------------------------------
+
+void export_sound_callback()
+{
+	if (sound_callback)
+		sound_callback();
 }
 
 //-------------------------------------------------
@@ -150,6 +162,16 @@ MAME_EXPORT void mame_set_frame_callback(void(*callback)(void))
 MAME_EXPORT void mame_set_periodic_callback(void(*callback)(void))
 {
 	periodic_callback = callback;
+}
+
+//-------------------------------------------------
+//  mame_set_sound_callback - subscribe to
+//  emulator_info::sound_hook()
+//-------------------------------------------------
+
+MAME_EXPORT void mame_set_sound_callback(void(*callback)(void))
+{
+	sound_callback = callback;
 }
 
 //-------------------------------------------------
