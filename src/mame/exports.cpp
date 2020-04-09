@@ -32,6 +32,7 @@
 
 extern int main(int argc, char *argv[]);
 lua_engine *lua() { return mame_machine_manager::instance()->lua(); }
+save_manager &save() { return mame_machine_manager::instance()->machine()->save(); }
 std::vector<std::unique_ptr<util::ovectorstream>> lua_strings_list;
 
 
@@ -308,4 +309,30 @@ MAME_EXPORT bool mame_lua_free_string(const char *pointer)
 	}
 	osd_printf_error("can't free buffer: no matching pointer found");
 	return false;
+}
+
+//-------------------------------------------------
+//  mame_save_buffer - write the current machine
+//  state to an allocated buffer
+//-------------------------------------------------
+
+MAME_EXPORT save_error mame_save_buffer(void *buf, int *length)
+{
+	*length = ram_state::get_size(save());
+	return save().write_buffer(buf, *length);
+}
+
+//-------------------------------------------------
+//  mame_load_buffer - restore the machine state
+//  from a buffer
+//-------------------------------------------------
+
+MAME_EXPORT save_error mame_load_buffer(void *buf, int length)
+{
+	if (length != ram_state::get_size(save()))
+	{
+		osd_printf_error("save buffer size mismatch");
+		return save_error::STATERR_READ_ERROR;
+	}
+	return save().read_buffer(buf, length);
 }
