@@ -33,6 +33,7 @@
 extern int main(int argc, char *argv[]);
 lua_engine *lua() { return mame_machine_manager::instance()->lua(); }
 save_manager &save() { return mame_machine_manager::instance()->machine()->save(); }
+address_space &space() { return mame_machine_manager::instance()->machine()->root_device().subdevice(":maincpu")->memory().space(AS_PROGRAM); }
 std::vector<std::unique_ptr<util::ovectorstream>> lua_strings_list;
 
 
@@ -335,4 +336,14 @@ MAME_EXPORT save_error mame_load_buffer(void *buf, int length)
 		return save_error::STATERR_READ_ERROR;
 	}
 	return save().read_buffer(buf, length);
+}
+
+//-------------------------------------------------
+//  mame_read_byte - read byte from maincpu
+//  program space
+//-------------------------------------------------
+
+MAME_EXPORT char mame_read_byte(unsigned int address)
+{
+	return space().read_byte(address);
 }
