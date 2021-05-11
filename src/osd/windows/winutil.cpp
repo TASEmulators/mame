@@ -61,6 +61,11 @@ BOOL win_is_gui_application()
 	IMAGE_NT_HEADERS *nt_headers;
 	IMAGE_OPTIONAL_HEADER *opt_header;
 
+#ifdef MAME_SHARED_LIB
+	// let the client decide how to handle the log
+	return FALSE;
+#endif
+
 	// is this the first time we've been ran?
 	if (is_first_time)
 	{
