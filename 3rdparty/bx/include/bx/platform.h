@@ -37,6 +37,10 @@
 #define BX_CRT_MSVC   0
 #define BX_CRT_NEWLIB 0
 
+#ifdef WATERBOX
+#	define BX_CRT_MUSL 1
+#endif // WATERBOX
+
 #ifndef BX_CRT_MUSL
 #	define BX_CRT_MUSL 0
 #endif // BX_CRT_MUSL

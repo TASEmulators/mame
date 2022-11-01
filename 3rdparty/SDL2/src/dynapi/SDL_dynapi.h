@@ -55,6 +55,8 @@
 #define SDL_DYNAMIC_API 0
 #elif defined(__clang_analyzer__)
 #define SDL_DYNAMIC_API 0  /* Turn off for static analysis, so reports are more clear. */
+#elif defined(WATERBOX) /* Need this off for waterbox, as everything is static */
+#define SDL_DYNAMIC_API 0
 #endif
 
 /* everyone else. This is where we turn on the API if nothing forced it off. */

@@ -1368,12 +1368,19 @@ end
 		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
 	}
 
-	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then	
 		if _OPTIONS["NO_X11"]=="1" then
-			defines {
-				"BGFX_CONFIG_RENDERER_OPENGLES=1",
-				"BGFX_CONFIG_RENDERER_OPENGL=0",
-			}
+			if _OPTIONS["MAIN_SHARED_LIB"] then
+				defines {
+					"BGFX_CONFIG_RENDERER_OPENGLES=0",
+					"BGFX_CONFIG_RENDERER_OPENGL=0",
+				}
+			else
+				defines {
+					"BGFX_CONFIG_RENDERER_OPENGLES=1",
+					"BGFX_CONFIG_RENDERER_OPENGL=0",
+				}
+			end
 		end
 	end
 
@@ -2032,6 +2039,18 @@ end
 		}
 	end
 
+	if _OPTIONS["targetos"]=="linux" then
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/haptic/dummy/SDL_syshaptic.c",
+			MAME_DIR .. "3rdparty/SDL2/src/joystick/dummy/SDL_sysjoystick.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_syssem.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_systhread.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_systls.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_sysmutex.c",
+			MAME_DIR .. "3rdparty/SDL2/src/timer/dummy/SDL_systimer.c",
+		}
+	end
+
 	configuration { "vs*" }
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/audio/xaudio2/SDL_xaudio2.c",
@@ -2094,6 +2113,23 @@ end
 			"-Wno-incompatible-pointer-types-discards-qualifiers",
 			"-Wno-unneeded-internal-declaration",
 			"-Wno-unused-const-variable",
+		}
+
+	configuration { "linux-*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/SDL2-override/linux",
+		}
+		defines {
+			"USING_PREMAKE_CONFIG_H",
+		}
+		buildoptions_c {
+			"-Wno-undef",
+			"-Wno-bad-function-cast",
+			"-Wno-strict-prototypes",
+		}
+		buildoptions {
+			"-Wno-undef",
+			"-Wno-bad-function-cast",
 		}
 
 	configuration { }
