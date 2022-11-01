@@ -13,7 +13,6 @@
 #include "../frontend/mame/mame.h"
 #include "../frontend/mame/clifront.h"
 #include "../frontend/mame/luaengine.h"
-#include "../../../../libco/libco.h"
 
 
 //**************************************************************************
@@ -60,6 +59,8 @@ T get_lua_value(const char *code)
 //**************************************************************************
 //  COTHREAD MAGIC
 //**************************************************************************
+
+#include <libco.h>
 
 static cothread_t co_control, co_emu;
 static int main_ret;
