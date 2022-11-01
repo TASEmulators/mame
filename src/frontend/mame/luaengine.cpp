@@ -1893,9 +1893,6 @@ void lua_engine::initialize()
 
 bool lua_engine::frame_hook()
 {
-#ifdef MAME_SHARED_LIB
-	export_frame_callback();
-#endif
 	return execute_function("LUA_ON_FRAME_DONE");
 }
 

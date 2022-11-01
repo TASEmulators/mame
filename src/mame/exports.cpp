@@ -13,6 +13,7 @@
 #include "../frontend/mame/mame.h"
 #include "../frontend/mame/clifront.h"
 #include "../frontend/mame/luaengine.h"
+#include "../../../../libco/libco.h"
 
 
 //**************************************************************************
@@ -23,7 +24,7 @@
 #ifdef WIN32
 #define MAME_EXPORT extern "C" __declspec(dllexport)
 #else
-#define MAME_EXPORT extern "C" __attribute__((visibility("default"))) 
+#define MAME_EXPORT extern "C" __attribute__((visibility("default"))) __attribute__((used))
 #endif
 #else
 #define MAME_EXPORT
@@ -32,7 +33,6 @@
 
 extern int main(int argc, char *argv[]);
 lua_engine *lua() { return mame_machine_manager::instance()->lua(); }
-save_manager &save() { return mame_machine_manager::instance()->machine()->save(); }
 address_space &space() { return mame_machine_manager::instance()->machine()->root_device().subdevice(":maincpu")->memory().space(AS_PROGRAM); }
 std::vector<std::unique_ptr<util::ovectorstream>> lua_strings_list;
 
@@ -57,27 +57,38 @@ T get_lua_value(const char *code)
 	throw false;
 }
 
+//**************************************************************************
+//  COTHREAD MAGIC
+//**************************************************************************
+
+static cothread_t co_control, co_emu;
+static int main_ret;
+static int main_argc;
+static std::string* main_argv;
+
+static void main_co()
+{
+	int argc = main_argc;
+	char** argv = new char*[argc];
+	for (int i = 0; i < argc; i++)
+	{
+		argv[i] = main_argv[i].data();
+	}
+
+	main_ret = main(argc, argv);
+	delete[] argv;
+
+	// switch back to the main cothread (a cothread does not return)
+	co_switch(co_control);
+}
+
 
 //**************************************************************************
 //  CALLBACKS
 //**************************************************************************
 
-void(*frame_callback)(void) = nullptr;
-void(*periodic_callback)(void) = nullptr;
 void(*sound_callback)(void) = nullptr;
-void(*boot_callback)(void) = nullptr;
 void(*log_callback)(int channel, int size, const char *buffer) = nullptr;
-
-//-------------------------------------------------
-//  export_frame_callback - inform the client that
-//  a frame has ended
-//-------------------------------------------------
-
-void export_frame_callback()
-{
-	if (frame_callback)
-		frame_callback();
-}
 
 //-------------------------------------------------
 //  export_periodic_callback - inform the client
@@ -86,8 +97,7 @@ void export_frame_callback()
 
 void export_periodic_callback()
 {
-	if (periodic_callback)
-		periodic_callback();
+	co_switch(co_control);
 }
 
 //-------------------------------------------------
@@ -109,8 +119,7 @@ void export_sound_callback()
 
 void export_boot_callback()
 {
-	if (boot_callback)
-		boot_callback();
+	co_switch(co_control);
 }
 
 //-------------------------------------------------
@@ -143,27 +152,20 @@ void export_output::output_callback(osd_output_channel channel, util::format_arg
 
 MAME_EXPORT int mame_launch(int argc, char *argv[])
 {
-	return main(argc, argv);
-}
+	main_ret = 0;
+	main_argc = argc;
+	main_argv = new std::string[argc];
+	for (int i = 0; i < argc; i++)
+	{
+		main_argv[i] = std::string(argv[i]);
+	}
+	
+	co_control = co_active();
+	co_emu = co_create(32768 * sizeof(void*), main_co);
+	co_switch(co_emu);
 
-//-------------------------------------------------
-//  mame_set_boot_callback - subscribe to
-//  emulator_info::frame_hook
-//-------------------------------------------------
-
-MAME_EXPORT void mame_set_frame_callback(void(*callback)(void))
-{
-	frame_callback = callback;
-}
-
-//-------------------------------------------------
-//  mame_set_periodic_callback - subscribe to
-//  emulator_info::periodic_check
-//-------------------------------------------------
-
-MAME_EXPORT void mame_set_periodic_callback(void(*callback)(void))
-{
-	periodic_callback = callback;
+	// if main returned, this will be non-zero
+	return main_ret;
 }
 
 //-------------------------------------------------
@@ -174,16 +176,6 @@ MAME_EXPORT void mame_set_periodic_callback(void(*callback)(void))
 MAME_EXPORT void mame_set_sound_callback(void(*callback)(void))
 {
 	sound_callback = callback;
-}
-
-//-------------------------------------------------
-//  mame_set_boot_callback - subscribe to
-//  mame_machine_manager::autoboot_callback
-//-------------------------------------------------
-
-MAME_EXPORT void mame_set_boot_callback(void(*callback)(void))
-{
-	boot_callback = callback;
 }
 
 //-------------------------------------------------
@@ -313,29 +305,13 @@ MAME_EXPORT bool mame_lua_free_string(const char *pointer)
 }
 
 //-------------------------------------------------
-//  mame_save_buffer - write the current machine
-//  state to an allocated buffer
+//  mame_coswitch - switch back to the cothread
+//  controlling main
 //-------------------------------------------------
 
-MAME_EXPORT save_error mame_save_buffer(void *buf, int *length)
+MAME_EXPORT void mame_coswitch()
 {
-	*length = ram_state::get_size(save());
-	return save().write_buffer(buf, *length);
-}
-
-//-------------------------------------------------
-//  mame_load_buffer - restore the machine state
-//  from a buffer
-//-------------------------------------------------
-
-MAME_EXPORT save_error mame_load_buffer(void *buf, int length)
-{
-	if (length != ram_state::get_size(save()))
-	{
-		osd_printf_error("save buffer size mismatch");
-		return save_error::STATERR_READ_ERROR;
-	}
-	return save().read_buffer(buf, length);
+	co_switch(co_emu);
 }
 
 //-------------------------------------------------
