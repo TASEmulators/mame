@@ -217,18 +217,18 @@ MAME_EXPORT int mame_lua_get_int(const char *code)
 
 //-------------------------------------------------
 //  mame_lua_get_double - execute provided lua code
-//  and return the result as double
+//  and return the result as long long
 //-------------------------------------------------
 
-MAME_EXPORT double mame_lua_get_double(const char *code)
+MAME_EXPORT long long mame_lua_get_double(const char *code)
 {
 	try
 	{
-		return get_lua_value<double>(code);
+		return (long long)get_lua_value<double>(code);
 	}
 	catch (...)
 	{
-		return .0;
+		return 0ll;
 	}
 }
 
