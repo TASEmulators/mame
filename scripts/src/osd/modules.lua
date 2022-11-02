@@ -171,6 +171,8 @@ function osdmodulesbuild()
 
 	files {
 		MAME_DIR .. "src/osd/modules/render/drawbgfx.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawnone.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawnone.h",
 		MAME_DIR .. "src/osd/modules/render/aviwrite.cpp",
 		MAME_DIR .. "src/osd/modules/render/aviwrite.h",
 		MAME_DIR .. "src/osd/modules/render/bgfxutil.cpp",

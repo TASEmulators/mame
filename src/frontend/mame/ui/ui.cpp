@@ -405,6 +405,7 @@ static void output_joined_collection(const TColl &collection, TEmitMemberFunc em
 
 void mame_ui_manager::display_startup_screens(bool first_time)
 {
+#ifndef WATERBOX
 	const int maxstate = 3;
 	int str = machine().options().seconds_to_run();
 	bool show_gameinfo = !machine().options().skip_gameinfo();
@@ -599,6 +600,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		while (m_handler_callback_type != ui_callback_type::GENERAL && !machine().scheduled_event_pending())
 			machine().video().frame_update();
 	}
+#endif
 }
 
 
@@ -609,6 +611,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 void mame_ui_manager::set_startup_text(const char *text, bool force)
 {
+#ifndef WATERBOX
 	static osd_ticks_t lastupdatetime = 0;
 	osd_ticks_t curtime = osd_ticks();
 
@@ -621,6 +624,7 @@ void mame_ui_manager::set_startup_text(const char *text, bool force)
 		lastupdatetime = curtime;
 		machine().video().frame_update();
 	}
+#endif
 }
 
 

@@ -498,12 +498,14 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	/* Initialize SDL */
 
+#ifndef WATERBOX
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO))
 	{
 		osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
 		exit(-1);
 	}
 	osd_sdl_info();
+#endif
 
 	defines_verbose();
 

@@ -411,7 +411,11 @@ int sdl_window_info::window_init()
 
 	create_target();
 
+#ifdef WATERBOX
+	set_renderer(osd_renderer::make_for_type(VIDEO_MODE_NONE, static_cast<osd_window*>(this)->shared_from_this()));
+#else
 	set_renderer(osd_renderer::make_for_type(video_config.mode, static_cast<osd_window*>(this)->shared_from_this()));
+#endif
 
 	int result = complete_create();
 
@@ -748,6 +752,7 @@ int sdl_window_info::complete_create()
 	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	//      width, height, m_extra_flags);
 
+#ifndef WATERBOX
 	if  (sdlwindow == nullptr )
 	{
 		if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
@@ -756,6 +761,7 @@ int sdl_window_info::complete_create()
 			osd_printf_error("Window creation failed: %s\n", SDL_GetError());
 		return 1;
 	}
+#endif
 
 	set_platform_window(sdlwindow);
 
