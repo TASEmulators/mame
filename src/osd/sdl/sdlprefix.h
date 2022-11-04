@@ -83,4 +83,8 @@ struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which m
 #define __APPLE_ALTIVEC__ 1
 #endif
 
+#if defined(MAME_WATERBOX)
+#define SDLMAME_NO64BITIO 1
+#endif
+
 #endif /* SDLMAME_UNIX */

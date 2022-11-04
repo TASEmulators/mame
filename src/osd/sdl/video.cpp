@@ -201,7 +201,7 @@ void sdl_osd_interface::extract_video_config()
 		video_config.mode = VIDEO_MODE_SOFT;
 	else if (strcmp(stemp, OSDOPTVAL_NONE) == 0)
 	{
-		video_config.mode = VIDEO_MODE_SOFT;
+		video_config.mode = VIDEO_MODE_NONE;
 		video_config.novideo = 1;
 
 		if (!emulator_info::standalone() && options().seconds_to_run() == 0)

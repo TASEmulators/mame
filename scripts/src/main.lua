@@ -24,6 +24,11 @@ end
 	uuid (os.uuid(_target .. "_" .. _subtarget))
 	kind "ConsoleApp"
 
+	if _OPTIONS["WATERBOX"]~=nil then
+		targetprefix "lib"
+		targetextension ".wbx"
+	end
+
 	configuration { "android*" }
 		targetprefix "lib"
 		targetname "main"
@@ -210,6 +215,12 @@ end
 		ext_includedir("flac"),
 	}
 
+	if _OPTIONS["WATERBOX"]~=nil then
+		includedirs {
+			ext_includedir("lua"),
+		}
+	end
+
 	resincludedirs {
 		MAME_DIR .. "scripts/resources/windows/" .. _target,
 		GEN_DIR  .. "resource",
@@ -270,6 +281,16 @@ if (STANDALONE~=true) then
 				MAME_DIR .. "scripts/resources/windows/mame",
 			}
 		configuration { }
+	end
+
+	if _OPTIONS["WATERBOX"]~=nil then
+		includedirs {
+			MAME_DIR .. "3rdparty/sol2",
+		}
+		files {
+			MAME_DIR .. "src/mame/exports.cpp",
+			MAME_DIR .. "src/mame/exports.h",
+		}
 	end
 
 	local mainfile = MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".cpp"
