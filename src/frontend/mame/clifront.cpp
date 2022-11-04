@@ -34,6 +34,9 @@
 #include "path.h"
 #include "unzip.h"
 #include "xmlfile.h"
+#if defined(MAME_WATERBOX)
+#include "../../mame/exports.h"
+#endif
 
 #include "osdepend.h"
 
@@ -286,6 +289,11 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	m_result = EMU_ERR_NONE;
 	mame_machine_manager *manager = mame_machine_manager::instance(m_options, m_osd);
 
+#if defined(MAME_WATERBOX)
+	export_output export_log;
+	osd_output::push(&export_log);
+#endif
+
 	try
 	{
 		start_execution(manager, args);
@@ -347,6 +355,10 @@ int cli_frontend::execute(std::vector<std::string> &args)
 		osd_printf_error("Caught unhandled exception\n");
 		m_result = EMU_ERR_FATALERROR;
 	}
+
+#if defined(MAME_WATERBOX)
+	osd_output::pop(&export_log);
+#endif
 
 	util::archive_file::cache_clear();
 	delete manager;

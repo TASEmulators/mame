@@ -1093,6 +1093,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_wavfile(),
 	m_first_reset(true)
 {
+#if !defined(MAME_WATERBOX) // note: applied upstream post 0.249 https://github.com/mamedev/mame/commit/687121ff05209675199db119af9d3e96456cc12c
 	// get filename for WAV file or AVI file if specified
 	const char *wavfile = machine.options().wav_write();
 	const char *avifile = machine.options().avi_write();
@@ -1100,6 +1101,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	// handle -nosound and lower sample rate if not recording WAV or AVI
 	if (m_nosound_mode && wavfile[0] == 0 && avifile[0] == 0)
 		machine.m_sample_rate = 11025;
+#endif
 
 	// count the mixers
 #if VERBOSE
@@ -1123,9 +1125,11 @@ sound_manager::sound_manager(running_machine &machine) :
 	// set the starting attenuation
 	set_attenuation(machine.options().volume());
 
+#if !defined(MAME_WATERBOX)
 	// start the periodic update flushing timer
 	m_update_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(sound_manager::update), this));
 	m_update_timer->adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
+#endif
 }
 
 

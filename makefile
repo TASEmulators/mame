@@ -23,6 +23,7 @@
 # TESTS = 1
 # BENCHMARKS = 1
 # OSD = sdl
+# WATERBOX =
 
 # NO_OPENGL = 0
 # USE_DISPATCH_GL = 0
@@ -496,6 +497,69 @@ OSD := sdl
 endif
 endif
 
+# Handle waterboxing
+ifdef WATERBOX
+ifneq '$(WATERBOX)' '0'
+
+# need to know this for the proper flags set
+ifndef WBX_DIR
+$(error WBX_DIR not set)
+endif
+
+# waterbox can only be compiled in linux and x86_64
+ifneq ($(OS),linux)
+$(error OS is not linux)
+endif
+ifneq ($(PLATFORM),x86)
+$(error PLATFORM is not x86)
+endif
+ifneq ($(ARCHITECTURE),_x64)
+$(error OS is not linux)
+endif
+
+# probably best to enforce generic
+DISTRO :=
+
+# waterbox is entirely static
+# and there's no access to system resources
+NO_USE_PORTAUDIO := 1
+NO_USE_PULSEAUDIO := 1
+DONT_USE_NETWORK := 1
+NO_USE_MIDI := 1
+NO_OPENGL := 1
+NO_X11 := 1
+NO_USE_XINPUT := 1
+USE_BUNDLED_LIB_SDL2 := 1
+
+# the magic flags for waterboxing
+WBX_SYSROOT := $(WBX_DIR)/sysroot
+WBX_CC := $(WBX_SYSROOT)/bin/musl-gcc
+WBX_LINKSCRIPT := $(WBX_DIR)/linkscript.T
+WBX_EXTRA_LIBS := -lc++ -lc++abi -lunwind -L $(WBX_SYSROOT)/lib/linux -lclang_rt.builtins-x86_64
+
+ifeq ($(CONFIG),debug)
+WBX_OBJS := $(WBX_DIR)/emulibc/obj/debug/emulibc.c.o $(WBX_DIR)/libco/obj/debug/amd64.c.o
+else
+WBX_OBJS := $(WBX_DIR)/emulibc/obj/release/emulibc.c.o $(WBX_DIR)/libco/obj/release/amd64.c.o
+endif
+
+OVERRIDE_CC := $(WBX_CC)
+OVERRIDE_CXX := $(WBX_CC)
+OVERRIDE_LD := $(WBX_CC)
+
+ARCHOPTS := -I$(WBX_DIR)/emulibc -I$(WBX_DIR)/libco \
+	-fvisibility=hidden -mcmodel=large -mstack-protector-guard=global \
+	-no-pie -fno-pic -fno-pie -fcf-protection=none -MD -MP $(ARCHOPTS)
+
+ARCHOPTS_CXX := -I$(WBX_SYSROOT)/include/c++/v1 \
+	-fno-use-cxa-atexit -fvisibility-inlines-hidden $(ARCHOPTS_CXX)
+
+LDOPTS := -static -Wl,--eh-frame-hdr -T $(WBX_LINKSCRIPT) $(ARCHOPTS) $(WBX_OBJS) $(WBX_EXTRA_LIBS) $(LDOPTS)
+
+PARAMS += --WATERBOX
+
+else
+
 #-------------------------------------------------
 # which 3rdparty library to build;
 #  link against system (common) library otherwise
@@ -550,6 +614,9 @@ endif
 
 ifdef USE_SYSTEM_LIB_PUGIXML
 PARAMS += --with-system-pugixml='$(USE_SYSTEM_LIB_PUGIXML)'
+endif
+
+endif
 endif
 
 # reverse logic for this one

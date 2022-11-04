@@ -797,6 +797,10 @@ public:
 	// fill the given buffer with 16-bit stereo audio samples
 	void samples(s16 *buffer);
 
+#if defined(MAME_WATERBOX)
+	void manual_update() { update(); }
+#endif
+
 private:
 	// set/reset the mute state for the given reason
 	void mute(bool mute, u8 reason);

@@ -14,7 +14,7 @@
 #include "input_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(SDLMAME_SDL2)
+#if defined(SDLMAME_SDL2) && !defined(MAME_WATERBOX)
 
 // standard sdl header
 #include <SDL2/SDL.h>
