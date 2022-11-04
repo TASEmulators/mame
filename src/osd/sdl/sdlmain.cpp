@@ -12,7 +12,7 @@
 #include <functional>
 
 #ifdef SDLMAME_UNIX
-#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID)) && (!defined(MAME_WATERBOX))
 #ifndef SDLMAME_HAIKU
 #include <fontconfig/fontconfig.h>
 #endif
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
 
 #ifdef SDLMAME_UNIX
 	sdl_entered_debugger = 0;
-#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID)) && (!defined(MAME_WATERBOX))
 	FcInit();
 #endif
 #endif
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
 	}
 
 #ifdef SDLMAME_UNIX
-#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID)) && (!defined(MAME_WATERBOX))
 	if (!sdl_entered_debugger)
 	{
 		FcFini();
@@ -199,7 +199,11 @@ int main(int argc, char** argv)
 #endif
 #endif
 
+#if defined(MAME_WATERBOX)
+	return res;
+#else
 	exit(res);
+#endif
 }
 
 //============================================================
@@ -465,6 +469,7 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	/* Initialize SDL */
 
+#if !defined(MAME_WATERBOX)
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO))
 	{
 		osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
@@ -476,6 +481,7 @@ void sdl_osd_interface::init(running_machine &machine)
 		fatalerror("Error: BGFX video does not work with wayland videodriver. Please change either of the options.");
 
 	osd_sdl_info();
+#endif
 
 	defines_verbose();
 

@@ -778,6 +778,7 @@ int sdl_window_info::complete_create()
 	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	//      width, height, m_extra_flags);
 
+#if !defined(MAME_WATERBOX)
 	if  (sdlwindow == nullptr )
 	{
 		if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
@@ -786,6 +787,7 @@ int sdl_window_info::complete_create()
 			osd_printf_error("Window creation failed: %s\n", SDL_GetError());
 		return 1;
 	}
+#endif
 
 	set_platform_window(sdlwindow);
 

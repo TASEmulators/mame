@@ -28,6 +28,9 @@
 
 #include "corestr.h"
 #include "xmlfile.h"
+#if defined(MAME_WATERBOX)
+#include "../../mame/exports.h"
+#endif
 
 #include "osdepend.h"
 
@@ -338,6 +341,9 @@ TIMER_CALLBACK_MEMBER(mame_machine_manager::autoboot_callback)
 		auto &l(*lua());
 		l.invoke(l.load_string(val));
 	}
+#if defined(MAME_WATERBOX)
+	export_boot_callback();
+#endif
 }
 
 void mame_machine_manager::reset()
@@ -467,6 +473,9 @@ void emulator_info::draw_user_interface(running_machine& machine)
 
 void emulator_info::periodic_check()
 {
+#if defined(MAME_WATERBOX)
+	export_periodic_callback();
+#endif
 	return mame_machine_manager::instance()->lua()->on_periodic();
 }
 

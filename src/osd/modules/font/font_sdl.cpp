@@ -8,7 +8,7 @@
 #include "font_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID)
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID) && !defined(MAME_WATERBOX)
 
 #include "corestr.h"
 #include "emucore.h"

@@ -129,6 +129,9 @@ protected:
 				add_monitor(monitor);
 			}
 		}
+#if defined(MAME_WATERBOX)
+		add_monitor(std::make_shared<sdl_monitor_info>(*this, 0, "", 16.0f / 9.0f));
+#endif
 		osd_printf_verbose("Leave init_monitors\n");
 
 		return 0;

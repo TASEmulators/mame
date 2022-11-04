@@ -29,7 +29,7 @@ function maintargetosdoptions(_target,_subtarget)
 			"X11",
 			"Xinerama",
 		}
-	else
+	elseif _OPTIONS["WATERBOX"]==nil then
 		if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
 			links {
 				"EGL",
@@ -44,7 +44,7 @@ function maintargetosdoptions(_target,_subtarget)
 		}
 	end
 
-	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" and _OPTIONS["targetos"]~="asmjs" then
+	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" and _OPTIONS["targetos"]~="asmjs" and _OPTIONS["WATERBOX"]==nil then
 		links {
 			"SDL2_ttf",
 		}
@@ -117,7 +117,7 @@ function maintargetosdoptions(_target,_subtarget)
 		}
 	configuration { }
 
-	if _OPTIONS["targetos"]=="macosx" then
+	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["WATERBOX"]~=nil then
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			links {
 				"SDL2",
@@ -310,9 +310,18 @@ if BASE_TARGETOS=="unix" then
 		end
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			if _OPTIONS["targetos"]~="android" then
-				links {
-					"SDL2",
-				}
+				if _OPTIONS["WATERBOX"]~=nil then
+					includedirs {
+						MAME_DIR .. "3rdparty/SDL2-override/waterbox",
+					}
+					defines {
+						"USING_PREMAKE_CONFIG_H",
+					}
+				else
+					links {
+						"SDL2",
+					}
+				end
 			end
 		else
 			local str = backtick(sdlconfigcmd() .. " --libs")
