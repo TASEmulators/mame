@@ -243,6 +243,11 @@ if _OPTIONS["gcc"]~=nil and not string.find(_OPTIONS["gcc"], "clang") then
 	buildoptions_cpp {
 		"-Wno-error=implicit-fallthrough",
 	}
+if _OPTIONS["WATERBOX"]~=nil then
+	buildoptions_c {
+		"-Wno-implicit-fallthrough",
+	}
+end
 end
 
 configuration { "vs*" }
@@ -1122,6 +1127,12 @@ project "bx"
 		"BX_CONFIG_DEBUG=0",
 	}
 
+	if _OPTIONS["WATERBOX"] then
+		defines {
+			"BX_CRT_MUSL=1",
+		}
+	end
+
 	configuration { "vs*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
@@ -1429,10 +1440,17 @@ end
 
 	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
 		if _OPTIONS["NO_X11"]=="1" then
-			defines {
-				"BGFX_CONFIG_RENDERER_OPENGLES=1",
-				"BGFX_CONFIG_RENDERER_OPENGL=0",
-			}
+			if _OPTIONS["WATERBOX"]~=nil then
+				defines {
+					"BGFX_CONFIG_RENDERER_OPENGLES=0",
+					"BGFX_CONFIG_RENDERER_OPENGL=0",
+				}
+			else
+				defines {
+					"BGFX_CONFIG_RENDERER_OPENGLES=1",
+					"BGFX_CONFIG_RENDERER_OPENGL=0",
+				}
+			end
 		end
 	end
 
@@ -2091,6 +2109,18 @@ end
 		}
 	end
 
+	if _OPTIONS["WATERBOX"]~=nil then
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/haptic/dummy/SDL_syshaptic.c",
+			MAME_DIR .. "3rdparty/SDL2/src/joystick/dummy/SDL_sysjoystick.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_syssem.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_systhread.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_systls.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/generic/SDL_sysmutex.c",
+			MAME_DIR .. "3rdparty/SDL2/src/timer/dummy/SDL_systimer.c",
+		}
+	end
+
 	configuration { "vs*" }
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/audio/xaudio2/SDL_xaudio2.c",
@@ -2154,6 +2184,23 @@ end
 			"-Wno-unneeded-internal-declaration",
 			"-Wno-unused-const-variable",
 		}
+
+	if _OPTIONS["WATERBOX"]~=nil then
+		configuration { "linux-*" }
+			includedirs {
+				MAME_DIR .. "3rdparty/SDL2-override/waterbox",
+			}
+			defines {
+				"USING_PREMAKE_CONFIG_H",
+			}
+			buildoptions_c {
+				"-Wno-undef",
+				"-Wno-bad-function-cast",
+				"-Wno-strict-prototypes",
+				"-Wno-unused-function",
+				"-Wno-incompatible-pointer-types",
+			}
+	end
 
 	configuration { }
 		includedirs {

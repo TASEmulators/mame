@@ -30,7 +30,7 @@
 #include <functional>
 
 #ifdef SDLMAME_UNIX
-#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID)) && (!defined(MAME_WATERBOX))
 #ifndef SDLMAME_HAIKU
 #include <fontconfig/fontconfig.h>
 #endif
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 
 #ifdef SDLMAME_UNIX
 	sdl_entered_debugger = 0;
-#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID)) && (!defined(MAME_WATERBOX))
 	FcInit();
 #endif
 #endif
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 	}
 
 #ifdef SDLMAME_UNIX
-#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID)) && (!defined(MAME_WATERBOX))
 	if (!sdl_entered_debugger)
 	{
 		FcFini();
@@ -109,5 +109,9 @@ int main(int argc, char** argv)
 #endif
 #endif
 
+#if defined(MAME_WATERBOX)
+	return res;
+#else
 	exit(res);
+#endif
 }

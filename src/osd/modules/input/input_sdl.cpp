@@ -15,7 +15,7 @@
 
 #include "modules/osdmodule.h"
 
-#if defined(OSD_SDL)
+#if defined(OSD_SDL) && !defined(MAME_WATERBOX)
 
 #include "assignmenthelper.h"
 #include "input_common.h"

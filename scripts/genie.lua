@@ -16,7 +16,12 @@ premake.make.override = { "TARGET" }
 
 MAME_DIR = (path.getabsolute("..") .. "/")
 --MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
-local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
+local MAME_BUILD_DIR
+if path.isabsolute(_OPTIONS["build-dir"]) then
+	MAME_BUILD_DIR = (_OPTIONS["build-dir"] .. "/")
+else
+	MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
+end
 local naclToolchain = ""
 
 newoption {
@@ -379,6 +384,11 @@ newoption {
 
 
 newoption {
+	trigger = "WATERBOX",
+	description = "Build as waterbox elf.",
+}
+
+newoption {
 	trigger = "SHLIB",
 	description = "Generate shared libs.",
 	allowed = {
@@ -720,6 +730,17 @@ end
 if _OPTIONS["NOASM"]=="1" then
 	defines {
 		"MAME_NOASM"
+	}
+end
+
+if _OPTIONS["WATERBOX"]~=nil then
+	defines {
+		"MAME_WATERBOX"
+	}
+	buildoptions {
+		"-Wno-format-overflow",
+		"-Wno-unused-function",
+		"-Wno-maybe-uninitialized",
 	}
 end
 
