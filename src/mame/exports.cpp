@@ -10,9 +10,11 @@
 
 #include "exports.h"
 #include "../emu/emu.h"
+#include "../emu/fileio.h"
 #include "../frontend/mame/mame.h"
 #include "../frontend/mame/clifront.h"
 #include "../frontend/mame/luaengine.h"
+#include "../lib/util/corestr.h"
 
 
 //**************************************************************************
@@ -27,6 +29,7 @@
 
 extern int main(int argc, char *argv[]);
 static inline lua_engine *lua() { return mame_machine_manager::instance()->lua(); }
+static inline device_t &root_device() { return mame_machine_manager::instance()->machine()->root_device(); }
 static inline address_space &space() { return mame_machine_manager::instance()->machine()->root_device().subdevice(":maincpu")->memory().space(AS_PROGRAM); }
 static inline sound_manager &sound() { return mame_machine_manager::instance()->machine()->sound(); }
 std::vector<std::unique_ptr<util::ovectorstream>> lua_strings_list;
@@ -122,7 +125,6 @@ static void main_co()
 //  CALLBACKS
 //**************************************************************************
 
-void(*sound_callback)(void) = nullptr;
 void(*log_callback)(int channel, int size, const char *buffer) = nullptr;
 
 //-------------------------------------------------
@@ -133,17 +135,6 @@ void(*log_callback)(int channel, int size, const char *buffer) = nullptr;
 void export_periodic_callback()
 {
 	co_switch(co_control);
-}
-
-//-------------------------------------------------
-//  export_sound_callback - inform the client
-//  that mame has already generated new sound samples
-//-------------------------------------------------
-
-void export_sound_callback()
-{
-	if (sound_callback)
-		sound_callback();
 }
 
 //-------------------------------------------------
@@ -204,16 +195,6 @@ MAME_EXPORT int mame_launch(int argc, char *argv[])
 	co_switch(co_emu);
 
 	return main_ret;
-}
-
-//-------------------------------------------------
-//  mame_set_sound_callback - subscribe to
-//  emulator_info::sound_hook()
-//-------------------------------------------------
-
-MAME_EXPORT void mame_set_sound_callback(void(*callback)(void))
-{
-	sound_callback = callback;
 }
 
 //-------------------------------------------------
@@ -349,4 +330,91 @@ MAME_EXPORT int mame_get_sound(short *samples)
 	s.manual_update();
 	s.samples(samples);
 	return s.sample_count();
+}
+
+static std::string nvram_filename(device_t &device)
+{
+	auto &root = root_device();
+	std::ostringstream result;
+	if (root.system_bios() != 0 && root.default_bios() != root.system_bios())
+		util::stream_format(result, "_%d", root.system_bios() - 1);
+
+	if (device.owner() != nullptr)
+	{
+		const char *software = nullptr;
+		for (device_t *dev = &device; dev->owner() != nullptr; dev = dev->owner())
+		{
+			device_image_interface *intf;
+			if (dev->interface(intf))
+			{
+				software = intf->basename_noext();
+				break;
+			}
+		}
+		if (software != nullptr && *software != '\0')
+			result << ";" << software;
+
+		std::string tag(device.tag());
+		tag.erase(0, 1);
+		strreplacechr(tag,':', '_');
+		result << ";" << tag;
+	}
+
+	return result.str();
+}
+
+//-------------------------------------------------
+//  mame_nvram_get_filenames - get nvram filenames
+//-------------------------------------------------
+
+MAME_EXPORT void mame_nvram_get_filenames(void(*filename_callback)(const char *filename))
+{
+	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
+	{
+		if (nvram.nvram_can_save())
+		{
+			filename_callback(nvram_filename(nvram.device()).c_str());
+		}
+	}
+}
+
+//-------------------------------------------------
+//  mame_nvram_save - save nvram
+//-------------------------------------------------
+
+MAME_EXPORT void mame_nvram_save()
+{
+	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
+	{
+		if (nvram.nvram_can_save())
+		{
+			emu_file file("", OPEN_FLAG_WRITE);
+			if (!file.open(nvram_filename(nvram.device())))
+			{
+				if (!nvram.nvram_save(file))
+					osd_printf_error("Error writing NVRAM file %s\n", file.filename());
+				file.close();
+			}
+		}
+	}
+}
+
+//-------------------------------------------------
+//  mame_nvram_load - load nvram
+//-------------------------------------------------
+
+MAME_EXPORT void mame_nvram_load()
+{
+	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
+	{
+		emu_file file("", OPEN_FLAG_READ);
+		if (nvram.nvram_backup_enabled() && !file.open(nvram_filename(nvram.device())))
+		{
+			if (!nvram.nvram_load(file))
+				osd_printf_error("Error reading NVRAM file %s\n", file.filename());
+			file.close();
+		}
+		else
+			nvram.nvram_reset();
+	}
 }
