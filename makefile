@@ -535,7 +535,7 @@ USE_BUNDLED_LIB_SDL2 := 1
 WBX_SYSROOT := $(WBX_DIR)/sysroot
 WBX_CC := $(WBX_SYSROOT)/bin/musl-gcc
 WBX_LINKSCRIPT := $(WBX_DIR)/linkscript.T
-WBX_EXTRA_LIBS := -lc++ -lc++abi -lunwind -L $(WBX_SYSROOT)/lib/linux -lclang_rt.builtins-x86_64
+WBX_EXTRA_LIBS := -L $(WBX_SYSROOT)/lib/linux
 
 ifeq ($(CONFIG),debug)
 WBX_OBJS := $(WBX_DIR)/emulibc/obj/debug/emulibc.c.o $(WBX_DIR)/libco/obj/debug/amd64.c.o
