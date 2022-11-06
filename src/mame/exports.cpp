@@ -32,6 +32,7 @@ static inline lua_engine *lua() { return mame_machine_manager::instance()->lua()
 static inline device_t &root_device() { return mame_machine_manager::instance()->machine()->root_device(); }
 static inline address_space &space() { return mame_machine_manager::instance()->machine()->root_device().subdevice(":maincpu")->memory().space(AS_PROGRAM); }
 static inline sound_manager &sound() { return mame_machine_manager::instance()->machine()->sound(); }
+static inline video_manager &video() { return mame_machine_manager::instance()->machine()->video(); }
 std::vector<std::unique_ptr<util::ovectorstream>> lua_strings_list;
 
 
@@ -321,15 +322,35 @@ MAME_EXPORT char mame_read_byte(unsigned int address)
 }
 
 //-------------------------------------------------
-//  mame_get_sound - get sound
+//  mame_sound_get_samples - get sound samples
+//  and return sample count. sample buffer should
+//  be able to hold at least 1 second of samples
 //-------------------------------------------------
 
-MAME_EXPORT int mame_get_sound(short *samples)
+MAME_EXPORT int mame_sound_get_samples(short *buffer)
 {
 	auto &s = sound();
 	s.manual_update();
-	s.samples(samples);
+	s.samples(buffer);
 	return s.sample_count();
+}
+
+//-------------------------------------------------
+//  mame_video_get_dimensions - get video dimensions
+//-------------------------------------------------
+
+MAME_EXPORT void mame_video_get_dimensions(int *width, int *height)
+{
+	video().compute_snapshot_size(*width, *height);
+}
+
+//-------------------------------------------------
+//  mame_video_get_pixels - get video pixels
+//-------------------------------------------------
+
+MAME_EXPORT void mame_video_get_pixels(unsigned int *buffer)
+{
+	video().pixels(buffer);
 }
 
 static std::string nvram_filename(device_t &device)
