@@ -26,6 +26,9 @@
 #include "romload.h"
 #include "tilemap.h"
 #include "uiinput.h"
+#if defined(MAME_WATERBOX)
+#include "../mame/exports.h"
+#endif
 
 #include "ui/uimain.h"
 
@@ -163,6 +166,10 @@ void running_machine::start()
 	time_t newbase = m_ioport.initialize();
 	if (newbase != 0)
 		m_base_time = newbase;
+
+#if defined(MAME_WATERBOX)
+	m_base_time = export_base_time_callback();
+#endif
 
 	// initialize natural keyboard support after ports have been initialized
 	m_natkeyboard = std::make_unique<natural_keyboard>(*this);

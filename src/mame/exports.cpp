@@ -127,6 +127,7 @@ static void main_co()
 //**************************************************************************
 
 void(*log_callback)(int channel, int size, const char *buffer) = nullptr;
+time_t(*base_time_callback)() = nullptr;
 
 //-------------------------------------------------
 //  export_periodic_callback - inform the client
@@ -147,6 +148,19 @@ void export_periodic_callback()
 void export_boot_callback()
 {
 	co_switch(co_control);
+}
+
+//-------------------------------------------------
+//  export_base_time_callback - request the base
+//  emulation time from the client
+//-------------------------------------------------
+
+time_t export_base_time_callback()
+{
+	if (base_time_callback)
+		return base_time_callback();
+
+	return 0;
 }
 
 //-------------------------------------------------
@@ -206,6 +220,16 @@ MAME_EXPORT int mame_launch(int argc, char *argv[])
 MAME_EXPORT void mame_set_log_callback(void(*callback)(int channel, int size, const char *buffer))
 {
 	log_callback = callback;
+}
+
+//-------------------------------------------------
+//  mame_set_base_time_callback - set a callback
+//  which returns the base time emulation uses
+//-------------------------------------------------
+
+MAME_EXPORT void mame_set_base_time_callback(time_t(*callback)())
+{
+	base_time_callback = callback;
 }
 
 //-------------------------------------------------
