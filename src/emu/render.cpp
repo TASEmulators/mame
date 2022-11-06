@@ -1726,9 +1726,11 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		bool have_default = false;
 		if (system.default_layout)
 			have_default |= load_layout_file(nullptr, *system.default_layout);
+#if !defined(MAME_WATERBOX)
 		m_manager.machine().config().apply_default_layouts(
 				[this, &have_default] (device_t &dev, internal_layout const &layout)
 				{ have_default |= load_layout_file(nullptr, layout, &dev); });
+#endif
 
 		have_artwork |= m_external_artwork;
 
