@@ -742,6 +742,12 @@ if _OPTIONS["WATERBOX"]~=nil then
 		"-Wno-unused-function",
 		"-Wno-maybe-uninitialized",
 	}
+	links {
+		"c++",
+		"c++abi",
+		"unwind",
+		"clang_rt.builtins-x86_64",
+	}
 end
 
 if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
