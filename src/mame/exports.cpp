@@ -31,6 +31,7 @@ extern int main(int argc, char *argv[]);
 static inline lua_engine *lua() { return mame_machine_manager::instance()->lua(); }
 static inline device_t &root_device() { return mame_machine_manager::instance()->machine()->root_device(); }
 static inline address_space &space() { return mame_machine_manager::instance()->machine()->root_device().subdevice(":maincpu")->memory().space(AS_PROGRAM); }
+static inline const ioport_list &ports() { return mame_machine_manager::instance()->machine()->ioport().ports(); }
 static inline sound_manager &sound() { return mame_machine_manager::instance()->machine()->sound(); }
 static inline video_manager &video() { return mame_machine_manager::instance()->machine()->video(); }
 std::vector<std::unique_ptr<util::ovectorstream>> lua_strings_list;
@@ -126,8 +127,11 @@ static void main_co()
 //  CALLBACKS
 //**************************************************************************
 
-void(*log_callback)(int channel, int size, const char *buffer) = nullptr;
-time_t(*base_time_callback)() = nullptr;
+static void(*log_callback)(int channel, int size, const char *buffer) = nullptr;
+static time_t(*base_time_callback)() = nullptr;
+static void(*input_poll_callback)() = nullptr;
+
+static bool lag_flag = false;
 
 //-------------------------------------------------
 //  export_periodic_callback - inform the client
@@ -161,6 +165,19 @@ time_t export_base_time_callback()
 		return base_time_callback();
 
 	return 0;
+}
+
+//-------------------------------------------------
+//  export_input_poll_callback - inform the client
+//  that mame has polled controller input ("unlag")
+//-------------------------------------------------
+
+void export_input_poll_callback()
+{
+	if (input_poll_callback)
+		input_poll_callback();
+
+	lag_flag = false;
 }
 
 //-------------------------------------------------
@@ -230,6 +247,16 @@ MAME_EXPORT void mame_set_log_callback(void(*callback)(int channel, int size, co
 MAME_EXPORT void mame_set_base_time_callback(time_t(*callback)())
 {
 	base_time_callback = callback;
+}
+
+//-------------------------------------------------
+//  mame_set_input_poll_callback - set a callback
+//  which is called every input poll
+//-------------------------------------------------
+
+MAME_EXPORT void mame_set_input_poll_callback(void(*callback)())
+{
+	input_poll_callback = callback;
 }
 
 //-------------------------------------------------
@@ -326,13 +353,17 @@ MAME_EXPORT bool mame_lua_free_string(const char *pointer)
 }
 
 //-------------------------------------------------
-//  mame_coswitch - switch back to the cothread
-//  controlling main
+//  mame_coswitch - switch back to the host
+//  cothread. this will also set the lag flag
+//  and return it. if the host cothread polls
+//  input, then the returned lag flag will be false
 //-------------------------------------------------
 
-MAME_EXPORT void mame_coswitch()
+MAME_EXPORT bool mame_coswitch()
 {
+	lag_flag = true;
 	co_switch(co_emu);
+	return lag_flag;
 }
 
 //-------------------------------------------------
@@ -343,6 +374,41 @@ MAME_EXPORT void mame_coswitch()
 MAME_EXPORT char mame_read_byte(unsigned int address)
 {
 	return space().read_byte(address);
+}
+
+//-------------------------------------------------
+//  mame_input_get_field_ptr - get field pointer
+//  by tag and field name
+//-------------------------------------------------
+
+MAME_EXPORT ioport_field *mame_input_get_field_ptr(const char *tag, const char *field_name)
+{
+	auto const port(ports().find(std::string(tag)));
+	if (port == ports().end())
+		return nullptr;
+
+	auto fn = std::string(field_name);
+
+	for (auto &f : port->second->fields())
+	{
+		if (f.name() == fn)
+			return &f;
+	}
+
+	return nullptr;
+}
+
+//-------------------------------------------------
+//  mame_set_inputs - set inputs using a client
+//  provided ioport_field pointer array
+//-------------------------------------------------
+
+MAME_EXPORT void mame_input_set_fields(ioport_field **fields, unsigned int *inputs, int length)
+{
+	for (int i = 0; i < length; i++)
+	{
+		fields[i]->set_value(inputs[i]);
+	}
 }
 
 //-------------------------------------------------
