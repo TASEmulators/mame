@@ -353,9 +353,9 @@ MAME_EXPORT bool mame_lua_free_string(const char *pointer)
 }
 
 //-------------------------------------------------
-//  mame_coswitch - switch back to the host
+//  mame_coswitch - switch back to the emu
 //  cothread. this will also set the lag flag
-//  and return it. if the host cothread polls
+//  and return it. if the emu cothread polls
 //  input, then the returned lag flag will be false
 //-------------------------------------------------
 
