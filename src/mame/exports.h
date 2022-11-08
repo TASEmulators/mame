@@ -22,6 +22,7 @@
 void export_periodic_callback();
 void export_boot_callback();
 time_t export_base_time_callback();
+void export_input_poll_callback();
 
 class export_output : public osd_output
 {

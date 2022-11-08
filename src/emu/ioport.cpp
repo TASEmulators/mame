@@ -99,6 +99,9 @@
 #include "ui/uimain.h"
 #include "inputdev.h"
 #include "natkeyboard.h"
+#if defined(MAME_WATERBOX)
+#include "../mame/exports.h"
+#endif
 
 #include "util/corestr.h"
 #include "util/ioprocsfilter.h"
@@ -1659,6 +1662,18 @@ ioport_value ioport_port::read()
 	// insert analog portions
 	for (analog_field &analog : m_live->analoglist)
 		analog.read(result);
+
+#if defined(MAME_WATERBOX)
+	// todo: should this trigger in more cases?
+	for (auto &field : m_fieldlist)
+	{
+		if (field.enabled() && field.type_class() == INPUT_CLASS_CONTROLLER)
+		{
+			export_input_poll_callback();
+			break;
+		}
+	}
+#endif
 
 	return result;
 }
