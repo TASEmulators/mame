@@ -66,12 +66,12 @@ static sol::object lua_run(const char *code)
 
 //-------------------------------------------------
 //  get_lua_value - execute lua code and return
-//  the resulting value as the expected type
-//  or as the default constructor of that type
+//  the resulting value as the expected type,
+//  or std::nullopt if an error occurs
 //-------------------------------------------------
 
 template <typename T>
-static inline T get_lua_value(const char *code)
+static inline std::optional<T> get_lua_value(const char *code)
 {
 	auto obj = lua_run(code);
 
@@ -82,7 +82,7 @@ static inline T get_lua_value(const char *code)
 		typeid(T).name(),
 		(sol::type_name(lua()->sol(), obj.get_type())).c_str());
 
-	return T();
+	return std::nullopt;
 }
 
 //**************************************************************************
@@ -269,35 +269,46 @@ MAME_EXPORT void mame_lua_execute(const char *code)
 }
 
 //-------------------------------------------------
-//  mame_lua_get_int - execute provided lua code
-//  and return the result as int
-//-------------------------------------------------
-
-MAME_EXPORT int mame_lua_get_int(const char *code)
-{
-	return get_lua_value<int>(code);
-}
-
-//-------------------------------------------------
-//  mame_lua_get_long - execute provided lua code
-//  and return the result as long
-//  nb: this is obtaining a double which is cast
-//  to long
-//-------------------------------------------------
-
-MAME_EXPORT long mame_lua_get_long(const char *code)
-{
-	return (long)get_lua_value<double>(code);
-}
-
-//-------------------------------------------------
 //  mame_lua_get_bool - execute provided lua code
 //  and return the result as bool
 //-------------------------------------------------
 
 MAME_EXPORT bool mame_lua_get_bool(const char *code)
 {
-	return get_lua_value<bool>(code);
+	return get_lua_value<bool>(code).value_or(false);
+}
+
+//-------------------------------------------------
+//  mame_lua_get_int - execute provided lua code
+//  and return the result as int
+//-------------------------------------------------
+
+MAME_EXPORT int mame_lua_get_int(const char *code)
+{
+	return get_lua_value<int>(code).value_or(0);
+}
+
+//-------------------------------------------------
+//  mame_lua_get_long - execute provided lua code
+//  and return the result as long
+//-------------------------------------------------
+
+MAME_EXPORT long mame_lua_get_long(const char *code)
+{
+	return get_lua_value<long>(code).value_or(0L);
+}
+
+//-------------------------------------------------
+//  mame_lua_get_double - execute provided lua code
+//  and return the result as double. this variant
+//  is special, as it avoids directly using a double,
+//  rather using a pointer to a double. this is to
+//  get around issues with the sysv<->msabi adapter
+//-------------------------------------------------
+
+MAME_EXPORT void mame_lua_get_double(const char *code, double *ret)
+{
+	*ret = get_lua_value<double>(code).value_or(.0);
 }
 
 //-------------------------------------------------
@@ -312,19 +323,19 @@ MAME_EXPORT const char *mame_lua_get_string(const char *code, int *out_length)
 {
 	auto string = get_lua_value<std::string>(code);
 
-	if (string.empty())
+	if (!string.has_value())
 	{
 		return nullptr;
 	}
 
 	auto buffer = std::make_unique<util::ovectorstream>();
-	int length = string.length();
+	int length = string->length();
 
 	buffer->reserve(length);
 	buffer->clear();
 	buffer->rdbuf()->clear();
 	buffer->seekp(0);
-	buffer->write(string.c_str(), length);
+	buffer->write(string->c_str(), length);
 
 	*out_length = length;
 	lua_strings_list.push_back(std::move(buffer));
