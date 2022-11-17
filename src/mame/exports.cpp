@@ -34,7 +34,6 @@ static inline address_space &space() { return mame_machine_manager::instance()->
 static inline const ioport_list &ports() { return mame_machine_manager::instance()->machine()->ioport().ports(); }
 static inline sound_manager &sound() { return mame_machine_manager::instance()->machine()->sound(); }
 static inline video_manager &video() { return mame_machine_manager::instance()->machine()->video(); }
-std::vector<std::unique_ptr<util::ovectorstream>> lua_strings_list;
 
 
 //-------------------------------------------------
@@ -106,8 +105,8 @@ static void main_co()
 	}
 
 	main_ret = main(argc, argv);
-	delete[] argv;
-	delete[] main_argv;
+	delete []argv;
+	delete []main_argv;
 
 	// main has returned, this is probably a crash.
 	// a cothread does not return, so we need to
@@ -300,15 +299,12 @@ MAME_EXPORT long mame_lua_get_long(const char *code)
 
 //-------------------------------------------------
 //  mame_lua_get_double - execute provided lua code
-//  and return the result as double. this variant
-//  is special, as it avoids directly using a double,
-//  rather using a pointer to a double. this is to
-//  get around issues with the sysv<->msabi adapter
+//  and return the result as double
 //-------------------------------------------------
 
-MAME_EXPORT void mame_lua_get_double(const char *code, double *ret)
+MAME_EXPORT double mame_lua_get_double(const char *code)
 {
-	*ret = get_lua_value<double>(code).value_or(.0);
+	return get_lua_value<double>(code).value_or(.0);
 }
 
 //-------------------------------------------------
@@ -328,39 +324,20 @@ MAME_EXPORT const char *mame_lua_get_string(const char *code, int *out_length)
 		return nullptr;
 	}
 
-	auto buffer = std::make_unique<util::ovectorstream>();
 	int length = string->length();
-
-	buffer->reserve(length);
-	buffer->clear();
-	buffer->rdbuf()->clear();
-	buffer->seekp(0);
-	buffer->write(string->c_str(), length);
-
+	auto *ret = new char[length + 1];
+	std::memcpy(ret, string->c_str(), length + 1);
 	*out_length = length;
-	lua_strings_list.push_back(std::move(buffer));
-	auto ret = lua_strings_list.back().get();
-	return &ret->vec()[0];
+	return ret;
 }
 
 //-------------------------------------------------
-//  mame_lua_free_string - destruct ovectorstream
-//  by dropping it from the list 
+//  mame_lua_free_string - delete char array
 //-------------------------------------------------
 
-MAME_EXPORT bool mame_lua_free_string(const char *pointer)
+MAME_EXPORT void mame_lua_free_string(const char *pointer)
 {
-	for (auto it = lua_strings_list.begin(); it < lua_strings_list.end(); ++it)
-	{
-		auto buf = it->get();
-		if (&buf->vec()[0] == pointer)
-		{
-			lua_strings_list.erase(it);
-			return true;
-		}
-	}
-	osd_printf_error("can't free buffer: no matching pointer found");
-	return false;
+	delete []pointer;
 }
 
 //-------------------------------------------------
@@ -394,7 +371,7 @@ MAME_EXPORT char mame_read_byte(unsigned int address)
 
 MAME_EXPORT ioport_field *mame_input_get_field_ptr(const char *tag, const char *field_name)
 {
-	auto const port(ports().find(std::string(tag)));
+	const auto port(ports().find(std::string(tag)));
 	if (port == ports().end())
 		return nullptr;
 
@@ -456,10 +433,7 @@ MAME_EXPORT void mame_video_get_pixels(unsigned int *buffer)
 
 static std::string nvram_filename(device_t &device)
 {
-	auto &root = root_device();
 	std::ostringstream result;
-	if (root.system_bios() != 0 && root.default_bios() != root.system_bios())
-		util::stream_format(result, "_%d", root.system_bios() - 1);
 
 	if (device.owner() != nullptr)
 	{
