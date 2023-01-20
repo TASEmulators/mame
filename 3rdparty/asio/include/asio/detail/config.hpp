@@ -1455,7 +1455,7 @@
 #endif // defined(ASIO_HAS_UNISTD_H)
 
 // Linux: epoll, eventfd and timerfd.
-#if defined(__linux__)
+#if defined(__linux__) && !defined(MAME_WATERBOX)
 # include <linux/version.h>
 # if !defined(ASIO_HAS_EPOLL)
 #  if !defined(ASIO_DISABLE_EPOLL)
@@ -1473,9 +1473,9 @@
 # endif // !defined(ASIO_HAS_EVENTFD)
 # if !defined(ASIO_HAS_TIMERFD)
 #  if defined(ASIO_HAS_EPOLL)
-#   if !defined(MAME_WATERBOX) && ((__GLIBC__ > 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 8))
+#   if (__GLIBC__ > 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 8)
 #    define ASIO_HAS_TIMERFD 1
-#   endif // !defined(MAME_WATERBOX) && ((__GLIBC__ > 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 8))
+#   endif // (__GLIBC__ > 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 8)
 #  endif // defined(ASIO_HAS_EPOLL)
 # endif // !defined(ASIO_HAS_TIMERFD)
 #endif // defined(__linux__)
