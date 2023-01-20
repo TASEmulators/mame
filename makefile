@@ -514,7 +514,7 @@ ifneq ($(PLATFORM),x86)
 $(error PLATFORM is not x86)
 endif
 ifneq ($(ARCHITECTURE),_x64)
-$(error OS is not linux)
+$(error ARCHITECTURE is not x64)
 endif
 
 # probably best to enforce generic
@@ -533,7 +533,7 @@ USE_BUNDLED_LIB_SDL2 := 1
 
 # the magic flags for waterboxing
 WBX_SYSROOT := $(WBX_DIR)/sysroot
-WBX_CC := $(WBX_SYSROOT)/bin/musl-gcc
+WBX_CC := $(WBX_SYSROOT)/bin/musl-clang
 WBX_LINKSCRIPT := $(WBX_DIR)/linkscript.T
 WBX_EXTRA_LIBS := -L $(WBX_SYSROOT)/lib/linux
 
@@ -547,14 +547,14 @@ OVERRIDE_CC := $(WBX_CC)
 OVERRIDE_CXX := $(WBX_CC)
 OVERRIDE_LD := $(WBX_CC)
 
-ARCHOPTS := -I$(WBX_DIR)/emulibc -I$(WBX_DIR)/libco \
+ARCHOPTS := -I$(WBX_DIR)/emulibc -I$(WBX_DIR)/libco -I$(WBX_SYSROOT)/intrinsics/x86_64 \
 	-fvisibility=hidden -mcmodel=large -mstack-protector-guard=global \
-	-no-pie -fno-pic -fno-pie -fcf-protection=none -MD -MP $(ARCHOPTS)
+	-fno-pic -fno-pie -fcf-protection=none -MP $(ARCHOPTS)
 
 ARCHOPTS_CXX := -I$(WBX_SYSROOT)/include/c++/v1 \
 	-fno-use-cxa-atexit -fvisibility-inlines-hidden $(ARCHOPTS_CXX)
 
-LDOPTS := -static -Wl,--eh-frame-hdr -T $(WBX_LINKSCRIPT) $(ARCHOPTS) $(WBX_OBJS) $(WBX_EXTRA_LIBS) $(LDOPTS)
+LDOPTS := -static -Wl,-no-pie,--eh-frame-hdr -T $(WBX_LINKSCRIPT) $(ARCHOPTS) $(WBX_OBJS) $(WBX_EXTRA_LIBS) $(LDOPTS)
 
 PARAMS += --WATERBOX
 
