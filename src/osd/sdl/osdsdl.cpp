@@ -262,6 +262,7 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	/* Initialize SDL */
 
+#if !defined(MAME_WATERBOX)
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO))
 	{
 		osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
@@ -273,6 +274,7 @@ void sdl_osd_interface::init(running_machine &machine)
 		fatalerror("Error: BGFX video does not work with wayland videodriver. Please change either of the options.");
 
 	osd_sdl_info();
+#endif
 
 	defines_verbose();
 
