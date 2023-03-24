@@ -1127,12 +1127,6 @@ project "bx"
 		"BX_CONFIG_DEBUG=0",
 	}
 
-	if _OPTIONS["WATERBOX"] then
-		defines {
-			"BX_CRT_MUSL=1",
-		}
-	end
-
 	configuration { "vs*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
