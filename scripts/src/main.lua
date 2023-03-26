@@ -286,6 +286,7 @@ if (STANDALONE~=true) then
 	if _OPTIONS["WATERBOX"]~=nil then
 		includedirs {
 			MAME_DIR .. "3rdparty/sol2",
+			MAME_DIR .. "src/frontend/mame",
 		}
 		files {
 			MAME_DIR .. "src/mame/exports.cpp",

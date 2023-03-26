@@ -558,7 +558,7 @@ ARCHOPTS := -I$(WBX_DIR)/emulibc -I$(WBX_DIR)/libco \
 ARCHOPTS_CXX := -I$(WBX_SYSROOT)/include/c++/v1 \
 	-fno-use-cxa-atexit -fvisibility-inlines-hidden $(ARCHOPTS_CXX)
 
-LDOPTS := -static -no-pie -Wl,--eh-frame-hdr -T $(WBX_LINKSCRIPT) $(ARCHOPTS) $(WBX_OBJS) $(WBX_EXTRA_LIBS) $(LDOPTS)
+LDOPTS := -static -no-pie -Wl,--eh-frame-hdr,-O2 -T $(WBX_LINKSCRIPT) $(ARCHOPTS) $(WBX_OBJS) $(WBX_EXTRA_LIBS) $(LDOPTS)
 
 PARAMS += --WATERBOX
 

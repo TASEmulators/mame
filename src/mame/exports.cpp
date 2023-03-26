@@ -9,12 +9,14 @@
 ***************************************************************************/
 
 #include "exports.h"
-#include "../emu/emu.h"
-#include "../emu/fileio.h"
-#include "../frontend/mame/mame.h"
-#include "../frontend/mame/clifront.h"
-#include "../frontend/mame/luaengine.h"
-#include "../lib/util/corestr.h"
+#include "emu.h"
+#include "fileio.h"
+#include "mame.h"
+#include "clifront.h"
+#include "luaengine.h"
+#include "ui/ui.h"
+#include "ui/info.h"
+#include "corestr.h"
 
 
 //**************************************************************************
@@ -34,6 +36,7 @@ static inline address_space &space() { return mame_machine_manager::instance()->
 static inline const ioport_list &ports() { return mame_machine_manager::instance()->machine()->ioport().ports(); }
 static inline sound_manager &sound() { return mame_machine_manager::instance()->machine()->sound(); }
 static inline video_manager &video() { return mame_machine_manager::instance()->machine()->video(); }
+static inline ui::machine_info &machine_info() { return mame_machine_manager::instance()->ui().machine_info(); }
 
 
 //-------------------------------------------------
@@ -513,4 +516,13 @@ MAME_EXPORT void mame_nvram_load()
 		else
 			nvram.nvram_reset();
 	}
+}
+
+//-------------------------------------------------
+//  mame_info_get_warnings_string - get warnings string
+//-------------------------------------------------
+
+MAME_EXPORT void mame_info_get_warnings_string(void(*info_callback)(const char *info))
+{
+	info_callback(machine_info().warnings_string().c_str());
 }
