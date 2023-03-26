@@ -555,10 +555,6 @@ ARCHOPTS := -I$(WBX_DIR)/emulibc -I$(WBX_DIR)/libco \
 	-fvisibility=hidden -mcmodel=large -mstack-protector-guard=global \
 	-fno-pic -fno-pie -fcf-protection=none -MP $(ARCHOPTS)
 
-ifeq ($(WBX_CC),$(WBX_SYSROOT)/bin/musl-clang)
-ARCHOPTS := $(ARCHOPTS) -I$(WBX_SYSROOT)/intrinsics/x86_64
-endif
-
 ARCHOPTS_CXX := -I$(WBX_SYSROOT)/include/c++/v1 \
 	-fno-use-cxa-atexit -fvisibility-inlines-hidden $(ARCHOPTS_CXX)
 
