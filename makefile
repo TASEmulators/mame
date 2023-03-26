@@ -510,12 +510,10 @@ endif
 ifneq ($(OS),linux)
 $(error OS is not linux)
 endif
-ifneq ($(PLATFORM),x86)
-$(error PLATFORM is not x86)
-endif
-ifneq ($(ARCHITECTURE),_x64)
-$(error ARCHITECTURE is not x64)
-endif
+# we set these directly here (mostly as the above detection is sometimes unreliable)
+# this will probably need to change whenever arm64 support comes to waterbox
+PLATFORM := x86
+ARCHITECTURE := _x64
 
 # probably best to enforce generic
 DISTRO :=
@@ -564,7 +562,7 @@ endif
 ARCHOPTS_CXX := -I$(WBX_SYSROOT)/include/c++/v1 \
 	-fno-use-cxa-atexit -fvisibility-inlines-hidden $(ARCHOPTS_CXX)
 
-LDOPTS := -static -Wl,--no-pie,--eh-frame-hdr -T $(WBX_LINKSCRIPT) $(ARCHOPTS) $(WBX_OBJS) $(WBX_EXTRA_LIBS) $(LDOPTS)
+LDOPTS := -static -no-pie -Wl,--eh-frame-hdr -T $(WBX_LINKSCRIPT) $(ARCHOPTS) $(WBX_OBJS) $(WBX_EXTRA_LIBS) $(LDOPTS)
 
 PARAMS += --WATERBOX
 
