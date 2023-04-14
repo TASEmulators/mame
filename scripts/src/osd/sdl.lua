@@ -365,9 +365,11 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 		MAME_DIR .. "3rdparty",
 	}
 	configuration { "linux-* or freebsd" }
-		buildoptions {
-			"-fPIC",
-		}
+		if _OPTIONS["WATERBOX"]==nil then
+			buildoptions {
+				"-fPIC",
+			}
+		end
 	configuration { }
 
 	qtdebuggerbuild()

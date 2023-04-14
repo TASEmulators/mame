@@ -645,7 +645,7 @@ bool ioport_condition::eval() const
 		return true;
 
 	// otherwise, read the referenced port and switch off the condition type
-	ioport_value const condvalue = m_port->read();
+	ioport_value const condvalue = m_port->read(true);
 	switch (m_condition)
 	{
 		case ALWAYS:            return true;
@@ -1583,7 +1583,7 @@ ioport_field *ioport_port::field(ioport_value mask) const
 //  read - return the value of an I/O port
 //-------------------------------------------------
 
-ioport_value ioport_port::read()
+ioport_value ioport_port::read(bool peek)
 {
 	if (!manager().safe_to_read())
 		throw emu_fatalerror("Input ports cannot be read at init time!");
@@ -1603,13 +1603,16 @@ ioport_value ioport_port::read()
 		analog.read(result);
 
 #if defined(MAME_WATERBOX)
-	// todo: should this trigger in more cases?
-	for (auto &field : m_fieldlist)
+	if (!peek)
 	{
-		if (field.enabled() && field.type_class() == INPUT_CLASS_CONTROLLER)
+		// todo: should this trigger in more cases?
+		for (auto &field : m_fieldlist)
 		{
-			export_input_poll_callback();
-			break;
+			if (field.enabled() && field.type_class() == INPUT_CLASS_CONTROLLER)
+			{
+				export_input_poll_callback();
+				break;
+			}
 		}
 	}
 #endif

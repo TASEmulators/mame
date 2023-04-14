@@ -773,7 +773,7 @@ public:
 	ioport_port_live &live() const { assert(m_live != nullptr); return *m_live; }
 
 	// read/write to the port
-	ioport_value read();
+	ioport_value read(bool peek = false);
 	void write(ioport_value value, ioport_value mask = ~0);
 
 	// other operations
