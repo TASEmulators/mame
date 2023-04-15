@@ -21,6 +21,10 @@
 #include <tuple>
 #include <vector>
 
+#ifdef MAME_WATERBOX
+#define SOL_NO_THREAD_LOCAL 1
+#endif
+
 #ifdef MAME_DEBUG
 #define SOL_ALL_SAFETIES_ON 1
 #else

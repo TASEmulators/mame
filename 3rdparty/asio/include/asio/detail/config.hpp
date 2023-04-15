@@ -1647,6 +1647,10 @@
 # endif // !defined(BOOST_NO_TYPEID)
 #endif // !defined(ASIO_NO_TYPEID)
 
+#if defined(MAME_WATERBOX)
+# define ASIO_DISABLE_THREADS 1
+#endif
+
 // Threads.
 #if !defined(ASIO_HAS_THREADS)
 # if !defined(ASIO_DISABLE_THREADS)

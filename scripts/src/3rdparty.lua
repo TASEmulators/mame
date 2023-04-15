@@ -1438,6 +1438,7 @@ end
 				defines {
 					"BGFX_CONFIG_RENDERER_OPENGLES=0",
 					"BGFX_CONFIG_RENDERER_OPENGL=0",
+					"BGFX_CONFIG_MULTITHREADED=0",
 				}
 			else
 				defines {

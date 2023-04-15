@@ -1230,7 +1230,7 @@ public:
         else {
             RAPIDJSON_ASSERT(false);    // see above note
 
-#if RAPIDJSON_HAS_CXX11
+#if RAPIDJSON_HAS_CXX11 && !defined(MAME_WATERBOX)
             // Use thread-local storage to prevent races between threads.
             // Use static buffer and placement-new to prevent destruction, with
             // alignas() to ensure proper alignment.
@@ -1241,7 +1241,7 @@ public:
             // simultaneously.
             __declspec(thread) static char buffer[sizeof(GenericValue)];
             return *new (buffer) GenericValue();
-#elif defined(__GNUC__) || defined(__clang__)
+#elif (defined(__GNUC__) || defined(__clang__)) && !defined(MAME_WATERBOX)
             // This will generate -Wexit-time-destructors in clang, but that's
             // better than having under-alignment.
             __thread static GenericValue buffer;
