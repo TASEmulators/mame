@@ -1105,6 +1105,7 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 			}
 
 			/* if not read-only, make the diff file */
+#if !defined(MAME_WATERBOX) // TODO: handle this like NVRAM (somehow)
 			if (!DISK_ISREADONLY(romp))
 			{
 				/* try to open or create the diff */
@@ -1117,6 +1118,7 @@ void rom_load_manager::process_disk_entries(std::initializer_list<std::reference
 					continue;
 				}
 			}
+#endif
 
 			/* we're okay, add to the list of disks */
 			LOG("Assigning to handle %d\n", DISK_GETINDEX(romp));
