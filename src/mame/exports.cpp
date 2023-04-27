@@ -225,7 +225,7 @@ MAME_EXPORT int mame_launch(int argc, char *argv[])
 	}
 	
 	co_control = co_active();
-	co_emu = co_create(32768 * sizeof(void*), main_co);
+	co_emu = co_create(65536 * sizeof(void*), main_co);
 	co_switch(co_emu);
 
 	return main_ret;
